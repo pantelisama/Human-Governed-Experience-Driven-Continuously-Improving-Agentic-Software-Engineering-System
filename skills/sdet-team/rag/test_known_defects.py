@@ -68,12 +68,30 @@ CASES = [
     ("D4-whole-record-in-expected", "P6",
      [row(sid="SCN-87-1", step="6", description="the quality metric is reported",
           assertion='"peak" in final',
-          expected="{'batch_idx': 12, 'delay': 60, 'sample_age': 5, 'peak': 1, 'abp_validity': 'valid'}",
+          expected="{'batch_idx': 12, 'delay': 60, 'sample_age': 5, 'peak': 1, 'channel_a_validity': 'valid'}",
           actual="'peak'")],
      [row(sid="SCN-87-1", step="6", description="the quality metric is reported",
           assertion='reported == ["peak"]', expected="['peak']", actual="['peak']")],
      '"peak" in final prints the entire batch record and records no value of its own'),
 ]
+
+
+def _args(case_rows):
+    """Rendered rows for most rules; captured assertions (dicts) for the rules that read those."""
+    return ([], case_rows) if case_rows and isinstance(case_rows[0], dict) else (case_rows, [])
+
+
+def _captured(label=None):
+    """One captured assertion of a looped check, as the pytest plugin records it."""
+    return {"test": "test_cv", "step_name": "the CV is below the bound", "label": label,
+            "assertion": "cv < threshold", "explanation": "4.8e-09 < 1e-05"}
+
+
+CASES.append(
+    ("D5-unlabelled-loop-rows", "R11e",
+     [_captured(), _captured()],
+     [_captured("sensor 0"), _captured("sensor 1")],
+     "two identical rows under one step -- the rows do not identify which iteration each covers"))
 
 
 def main() -> int:
@@ -84,8 +102,8 @@ def main() -> int:
             failures.append("%s: rule %s is not registered" % (case_id, rule_id))
             continue
         empty = pathlib.Path(".")
-        fires_on_bad = bool(fn(bad, [], empty))
-        fires_on_good = bool(fn(good, [], empty))
+        fires_on_bad = bool(fn(*_args(bad), empty))
+        fires_on_good = bool(fn(*_args(good), empty))
         if not fires_on_bad:
             failures.append("%s: %s MISSED the defect a human filed (%s)"
                             % (case_id, rule_id, filed_by))

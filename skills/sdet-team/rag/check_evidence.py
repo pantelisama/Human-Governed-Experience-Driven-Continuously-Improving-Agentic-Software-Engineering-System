@@ -62,7 +62,7 @@ def _fold(text: str) -> str:
     """Letters only, lowercased, so one identifier reads the same in any convention.
 
     A step names `packetMismatch`, after the C++ enumerator; the row asserting it
-    is `failed_packet_matching == []`, in Python's. A reviewer reads those as the same
+    is `packet_mismatch == []`, in Python's. A reviewer reads those as the same
     word, and a rule that compares them literally reports a finding that is not there.
     """
     return re.sub(r"[^a-z]", "", text.lower())
@@ -306,10 +306,10 @@ def r11_duplicate_rows(rows, assertions, evidence_dir):
     if not assertions:
         return []
     seen = collections.Counter(
-        (a.get("test", ""), a.get("step_name") or "", a.get("assertion", ""),
-         a.get("explanation", ""))
+        (a.get("test", ""), a.get("step_name") or "", a.get("label") or "",
+         a.get("assertion", ""), a.get("explanation", ""))
         for a in assertions)
-    return ["%s / %s: %s (x%d)" % (k[0][:40], (k[1] or "?")[:28], k[2][:48], n)
+    return ["%s / %s: %s (x%d)" % (k[0][:40], (k[1] or "?")[:28], k[3][:48], n)
             for k, n in seen.items() if n > 1]
 
 
@@ -558,8 +558,8 @@ def b5_claim_not_evidenced(rows, assertions, evidence_dir):
         for m in re.finditer(r"[\"\u201c\u2018\']([\w./-]+)[\"\u201d\u2019\']", desc):
             claims.append(("literal", m.group(1)))
 
-        # Folded: a step naming "channel B" is answered by `cbfi_min`, and one naming
-        # "packetMismatch" by `failed_packet_matching`.
+        # Folded: a step naming "channel B" is answered by `channel_b_min`, and one naming
+        # "packetMismatch" by `packet_mismatch`.
         evidenced_lower = evidenced.lower()
         evidenced_folded = _fold(evidenced)
         # An identifier may reach the record through a value derived from it in an

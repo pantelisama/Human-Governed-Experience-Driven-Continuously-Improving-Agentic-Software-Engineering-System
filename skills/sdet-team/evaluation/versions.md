@@ -75,6 +75,19 @@ evaluation: pending. The measurable claim is that human correction rate falls; i
 rollback: the four files are additive and referenced only from the SKILL.md table
 ```
 
-That last entry states its own weakness on purpose. A version added on a specification
+### v0.4 — labelled evidence rows
+
+```yaml
+version: 0.4
+changes: rag/check_evidence.py R11e keys duplicates on the captured label too;
+         rag/test_known_defects.py replays captured-assertion cases (D5)
+driven_by: a reviewer asked for row labels carried beside the assertion, not inside it
+evidence: R11e reported 3 and 7 false duplicates on rows told apart only by their label
+approved_by: the team's human owner, 2026-09-28
+evaluation: D1-D5 all caught; R11e silent on labelled rows, still fires on unlabelled ones
+rollback: revert the two files; R11e then ignores labels again
+```
+
+That v0.3 entry states its own weakness on purpose. A version added on a specification
 rather than on counted evidence is a hypothesis, and recording it as one is what stops it
 being cited later as a demonstrated improvement.
